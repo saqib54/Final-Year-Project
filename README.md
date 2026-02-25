@@ -160,16 +160,13 @@ The arm structure was designed in CAD to mimic natural human anatomy.
 ---
 ## 📸 System Preview
 
-<p align="center">
-  <img src="assets/images/system-demo.png" width="700"/>
-</p>
-
----
-
-## 🎥 Project Demonstration
 
 <p align="center">
-  <video src="assets/videos/demo.mp4" controls width="700"></video>
+  <img 
+    src="https://github.com/user-attachments/assets/1ba1fac6-fa4d-456d-a292-d524e71c899c"
+    width="700"
+    alt="System Screenshot"
+  />
 </p>
 ### **How to Deploy**
 
