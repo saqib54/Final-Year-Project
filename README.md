@@ -1,3 +1,6 @@
+<!-- Banner -->
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:4CAF50,100:2196F3&height=200&section=header&text=Welcome%20to%20My%20GitHub!&fontSize=40&fontColor=ffffff" alt="header"/>
+
 
 <p align="center">
   <b>Brain-Controlled Prosthetic Arm (Non-Invasive BCI)</b><br>
