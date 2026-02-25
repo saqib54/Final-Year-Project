@@ -138,9 +138,9 @@ The arm structure was designed in CAD to mimic natural human anatomy.
 
 ### **Development Team**
 
-* **Saqib Azair** – Lead Hardware Developer & System Integration.
-* **Hiba Zari Nadeem** – Research Lead & Documentation.
-* **Shahbano** – 3D Modeling & CAD Design.
+* **Saqib Azair** 
+* **Hiba Zari Nadeem**
+* **Shahbano** 
 
 ### **Supervision**
 
