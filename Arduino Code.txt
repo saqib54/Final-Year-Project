@@ -1,0 +1,96 @@
+#include "BluetoothSerial.h"
+
+BluetoothSerial SerialBT;
+
+// --- CONFIGURATION ---
+uint8_t address[6] = {0x6A, 0xA6, 0x06, 0x94, 0xE0, 0x2B}; // Updated MAC
+const char *pin = "1234";                                 // Updated PIN
+const int ledPin = 2;                                     // ESP32 Built-in LED
+
+// --- VARIABLES ---
+#define SYNC_BYTE 0xAA
+int attention = 0;
+int meditation = 0;
+int signalQuality = 200;
+
+void setup() {
+  Serial.begin(115200);
+  
+  // LED Pin Setup
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, LOW); // Start with light OFF
+  
+  // Start Bluetooth
+  SerialBT.begin("ESP32_Brain_Light", true); 
+  SerialBT.setPin(pin, 4); 
+  
+  Serial.println("Connecting to MindWave Headset...");
+  bool connected = SerialBT.connect(address);
+  
+  if(connected) {
+    Serial.println("CONNECTED! Ready to control light.");
+  } else {
+    Serial.println("Failed to connect. Ensure headset is in pairing mode.");
+  }
+}
+
+void loop() {
+  if (SerialBT.available()) {
+    if (SerialBT.read() == SYNC_BYTE) {
+      if (SerialBT.read() == SYNC_BYTE) {
+        byte payloadLength = SerialBT.read();
+        if (payloadLength > 169) return; 
+
+        byte payloadData[64];
+        byte generatedChecksum = 0;
+
+        for (int i = 0; i < payloadLength; i++) {
+          payloadData[i] = SerialBT.read();
+          generatedChecksum += payloadData[i];
+        }
+
+        byte checksum = SerialBT.read();
+        generatedChecksum = 255 - generatedChecksum;
+
+        if (checksum == generatedChecksum) {
+          parsePayload(payloadData, payloadLength);
+        }
+      }
+    }
+  }
+}
+
+void parsePayload(byte* packetData, byte packetLength) {
+  int i = 0;
+  while (i < packetLength) {
+    byte code = packetData[i];
+    switch (code) {
+      case 0x02: signalQuality = packetData[i+1]; i += 2; break;
+      case 0x04: attention = packetData[i+1];     i += 2; break;
+      case 0x05: meditation = packetData[i+1];    i += 2; break;
+      case 0x80: i += 4; break; 
+      case 0x83: i += 26; break; 
+      default: i++; break;
+    }
+  }
+
+  // --- CONTROL & OUTPUT ---
+  if (signalQuality < 200) {
+    Serial.print("Signal: "); Serial.print(signalQuality);
+    Serial.print(" | Attention: "); Serial.print(attention);
+    Serial.print(" | Meditation: "); Serial.println(meditation);
+
+    // Light Control Logic
+    if (attention > 40) {
+      digitalWrite(ledPin, HIGH); // Turn ON light
+      Serial.println(">>> LIGHT ON (Focusing...)");
+    } 
+    else if (attention < 40) {
+      digitalWrite(ledPin, LOW);  // Turn OFF light
+      Serial.println(">>> LIGHT OFF (Relaxing...)");
+    }
+  } else {
+    Serial.println("Warning: Signal 200 - Fit Headset Properly!");
+    digitalWrite(ledPin, LOW); // Turn OFF if no signal
+  }
+}
